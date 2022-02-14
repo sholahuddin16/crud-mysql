@@ -1,0 +1,81 @@
+1. instal nodejs
+npm init
+
+2. instal package xpress mysql2 sequelize
+
+3. membuat router default app.js
+const express = require("express");
+const req = require("express/lib/request");
+const app = express();
+
+app.get("/", (req, res) => res.send("respon nodejs berhasil"));
+
+app.listen(4500, () => console.log("port berjalan di 45000"));
+
+4. membuat config untuk menkoneksikan database dengan node js di config/db.js
+const sequelize = require("sequelize");
+
+const db = new sequelize("crudnodejs", "root", "", {
+    dialect: "mysql"
+});
+
+db.sync({});
+
+module.exports = db;
+
+5. panggil db.js ke app.js
+const db = require("./config/db");
+
+6. meng autheticate antara nodejs ke database
+b.authenticate().then(() =>
+    console.log("berhasil terkoneksi dengan database")
+);
+
+7. membuat models user di medels/user.js
+const Sequelize = require("sequelize");
+const db = require("../config/db");
+
+const User = db.define(
+    "user",
+    {
+        username: {type: Sequelize.STRING},
+        email: {type: Sequelize.STRING},
+        password: {type: Sequelize.STRING},
+    },
+    {
+        freezTableName: true
+    }
+);
+
+module.exports = User;
+
+8. panggil user models di app.js
+const User = require("./models/User"); 
+
+9. membuat function CRUD di app.js
+a. function create
+app.post("/crud", async (req, res) => {
+    try {
+        //destructuring object
+        const { username, email, password } = req.body;
+
+        //membuat initialisasi user berfungsi untuk menstore data ke database
+        const newUser = new User({
+            username, 
+            email, 
+            password
+        })
+        
+        // await = menjalankan kode models user
+        await newUser.save();
+
+         // menampilkan newuser ketika di save postman
+        res.json(newUser);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("server error")
+    }
+});
+
+10. coba dipostman
+
